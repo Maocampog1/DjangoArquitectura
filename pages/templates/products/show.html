@@ -1,0 +1,20 @@
+{% extends 'pages/base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block header_title %}{{ subtitle }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <img src="https://static.djangoproject.com/img/logos/django-logo-positive.svg" class="card-img-top" alt="Product Image">
+            <div class="card-body text-center">
+                <h4 class="card-title">{{ product.name }}</h4>
+                <p class="card-text">{{ product.description }}</p>
+                <p class="fw-bold text-success">Price: ${{ product.price }}</p>
+                <a href="{% url 'index' %}" class="btn btn-secondary mt-3">Back to Products</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
