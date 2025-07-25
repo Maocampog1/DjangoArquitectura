@@ -4,7 +4,8 @@ from .views import (
     AboutPageView,
     ContactPageView,
     ProductIndexView,
-    ProductShowView
+    ProductShowView,
+    ProductCreateView
 )
 
 urlpatterns = [
@@ -14,8 +15,14 @@ urlpatterns = [
     # About y Contact
     path('about/', AboutPageView.as_view(), name='about'),
     path('contact/', ContactPageView.as_view(), name='contact'),
-
+    # Formulario de creación de productos
+    path('products/create', ProductCreateView.as_view(), name='form'),
     # Productos
     path('products/', ProductIndexView.as_view(), name='index'),
     path('products/<str:id>/', ProductShowView.as_view(), name='show'),
+
+     
+
+
 ]
+

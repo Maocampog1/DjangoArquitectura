@@ -2,14 +2,11 @@
 # Create your views here.
 from django.shortcuts import render # here by default
 from django.views.generic import TemplateView
-
-from django.shortcuts import render
-from django.http import HttpResponse
-from django.views.generic import TemplateView
 from django.views import View
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-
+from django import forms
+from django.shortcuts import redirect
 
 # Create your views here.
 class HomePageView(TemplateView):
@@ -88,3 +85,47 @@ class ProductShowView(View):
         viewData["subtitle"] = product["name"] + " - Product information"
         viewData["product"] = product
         return render(request, self.template_name, viewData)
+
+#Actividad 7
+class ProductForm(forms.Form):
+    name = forms.CharField(required=True)
+    price = forms.FloatField(required=True)
+
+    # Validación personalizada para el campo price
+    def clean_price(self):
+        price = self.cleaned_data.get('price')
+
+        # Verifica que sea mayor que 0
+        if price is not None and price <= 0:
+            raise forms.ValidationError("The price must be greater than 0.")
+
+        return price
+    
+
+class ProductCreateView(View):
+    template_name = 'products/create.html'
+
+    def get(self, request):
+        form = ProductForm()
+        viewData = {
+            "title": "Create product",
+            "form": form
+        }
+        return render(request, self.template_name, viewData)
+
+    def post(self, request):
+        form = ProductForm(request.POST)
+        if form.is_valid():
+            # Pasamos created=True para mostrar el mensaje en la plantilla
+            viewData = {
+                "title": "Create product",
+                "form": ProductForm(),  # formulario vacío luego de crear
+                "created": True
+            }
+            return render(request, self.template_name, viewData)
+        else:
+            viewData = {
+                "title": "Create product",
+                "form": form
+            }
+            return render(request, self.template_name, viewData)
