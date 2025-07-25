@@ -1,9 +1,7 @@
 from django.urls import path
-from .views import homePageView
+from .views import homePageView, AboutPageView  # Importa también AboutPageView
 
 urlpatterns = [
-
-    # Define the URL pattern for the home page
-    path("", homePageView, name='home')
-
+    path("", homePageView, name='home'),
+    path('about/', AboutPageView.as_view(), name='about'),
 ]

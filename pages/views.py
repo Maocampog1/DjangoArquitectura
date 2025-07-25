@@ -3,7 +3,7 @@
 from django.shortcuts import render # here by default
 from django.views.generic import TemplateView
 
-cfrom django.shortcuts import render
+from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.generic import TemplateView
 
@@ -24,3 +24,17 @@ class AboutPageView(TemplateView):
             "author": "Developed by: Maria Alejandra Ocampo",
         })
         return context
+
+class ContactPageView(TemplateView):
+    template_name = "pages/contact.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            "title": "Contact",
+            "subtitle": "Contact Us",
+            "email": "marialeja@example.com",
+            "address": "123Sur , Medellin , Colombia",
+            "phone": "+57 (305) 234-4567",
+        })
+        return context  
