@@ -74,14 +74,15 @@ class ProductIndexView(ListView):
         return context
 
 # Formulario
-class ProductForm(forms.Form):
-    name = forms.CharField(required=True)
-    price = forms.FloatField(required=True)
+class ProductForm(forms.ModelForm):
+    class Meta:
+        model = Product
+        fields = ['name', 'price']
 
     def clean_price(self):
         price = self.cleaned_data.get('price')
         if price is not None and price <= 0:
-            raise forms.ValidationError("The price must be greater than 0.")
+            raise forms.ValidationError('Price must be greater than zero.')
         return price
 
 # Crear producto
@@ -90,22 +91,21 @@ class ProductCreateView(View):
 
     def get(self, request):
         form = ProductForm()
-        return render(request, self.template_name, {"title": "Create product", "form": form})
+        viewData = {}
+        viewData["title"] = "Create product"
+        viewData["form"] = form
+        return render(request, self.template_name, viewData)
 
     def post(self, request):
         form = ProductForm(request.POST)
+        viewData = {}
+        viewData["title"] = "Create product"
+        viewData["form"] = form
+
         if form.is_valid():
-            Product.objects.create(
-                name=form.cleaned_data["name"],
-                price=form.cleaned_data["price"]
-            )
-            return render(request, self.template_name, {
-                "title": "Create product",
-                "form": ProductForm(),
-                "created": True
-            })
-        return render(request, self.template_name, {
-            "title": "Create product",
-            "form": form
-        })
-    
+            form.save()
+            viewData["created"] = True  # pasamos esta variable para mostrar mensaje
+            viewData["form"] = ProductForm()  # limpiamos el formulario
+            return render(request, self.template_name, viewData)
+        else:
+            return render(request, self.template_name, viewData)
