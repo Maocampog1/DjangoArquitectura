@@ -96,16 +96,13 @@ class ProductCreateView(View):
         viewData["form"] = form
         return render(request, self.template_name, viewData)
 
-    def post(self, request):
-        form = ProductForm(request.POST)
+def post(self, request):
+    form = ProductForm(request.POST)
+    if form.is_valid():
+        form.save()
+        return redirect('product-created')
+    else:
         viewData = {}
         viewData["title"] = "Create product"
         viewData["form"] = form
-
-        if form.is_valid():
-            form.save()
-            viewData["created"] = True  # pasamos esta variable para mostrar mensaje
-            viewData["form"] = ProductForm()  # limpiamos el formulario
-            return render(request, self.template_name, viewData)
-        else:
-            return render(request, self.template_name, viewData)
+        return render(request, self.template_name, viewData)

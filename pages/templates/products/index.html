@@ -41,7 +41,20 @@
         {% else %}
           <p class="card-text">Price: ${{ product.price }}</p>
         {% endif %}
-        <a href="{% url 'index' %}" class="btn btn-primary">Volver a los productos</a>
+
+        {# Mostrar comentarios del producto #}
+        <h6 class="mt-3">Comentarios:</h6>
+        {% if product.comment_set.count > 0 %}
+            <ul>
+            {% for comment in product.comment_set.all %}
+                <li>- {{ comment.description }}</li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p>No hay comentarios aún.</p>
+        {% endif %}
+
+        <a href="{% url 'index' %}" class="btn btn-primary mt-3">Volver a los productos</a>
       </div>
     </div>
   </div>

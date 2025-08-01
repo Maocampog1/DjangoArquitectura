@@ -23,6 +23,12 @@
                 {% endif %}
                 
                 <a href="{% url 'index' %}" class="btn btn-secondary mt-3">Back to Products</a>
+
+                {% for comment in product.comment_set.all %}
+                    {{ comment.description }}<br />
+                {% endfor %} 
+            
+            
             </div>
         </div>
     </div>
