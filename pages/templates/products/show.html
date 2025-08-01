@@ -4,22 +4,24 @@
 {% block header_title %}{{ subtitle }}{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card">
-            <img src="https://static.djangoproject.com/img/logos/django-logo-positive.svg" class="card-img-top" alt="Product Image">
-            <div class="card-body text-center">
-
-                {# Condición: Si el precio > 100, el nombre se ve en rojo #}
-                {% if product.price > 100 %}
-                    <h4 class="card-title text-danger">{{ product.name }}</h4>
-                {% else %}
-                    <h4 class="card-title">{{ product.name }}</h4>
-                {% endif %}
-
+<div class="card mb-3">
+    <div class="row g-0">
+        <div class="col-md-4">
+            <img src="https://static.djangoproject.com/img/logos/django-logo-positive.svg"
+                 class="img-fluid rounded-start"
+                 alt="Product Image">
+        </div>
+        <div class="col-md-8">
+            <div class="card-body">
+                <h5 class="card-title">{{ product.name }}</h5>
                 <p class="card-text">{{ product.description }}</p>
-                <p class="fw-bold text-success">Price: ${{ product.price }}</p>
 
+                {% if product.price > 2000 %}
+                    <p class="card-text" style="color: red;">Price: ${{ product.price }}</p>
+                {% else %}
+                    <p class="card-text">Price: ${{ product.price }}</p>
+                {% endif %}
+                
                 <a href="{% url 'index' %}" class="btn btn-secondary mt-3">Back to Products</a>
             </div>
         </div>

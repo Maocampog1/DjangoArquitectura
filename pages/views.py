@@ -1,18 +1,17 @@
-
-# Create your views here.
-from django.shortcuts import render # here by default
-from django.views.generic import TemplateView
+from django.shortcuts import render, get_object_or_404
+from django.views.generic import TemplateView, ListView
 from django.views import View
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django import forms
-from django.shortcuts import redirect
 
-# Create your views here.
+from .models import Product
+
+# Página principal
 class HomePageView(TemplateView):
     template_name = 'pages/home.html'
 
-
+# About
 class AboutPageView(TemplateView):
     template_name = 'pages/about.html'
 
@@ -25,7 +24,8 @@ class AboutPageView(TemplateView):
             "author": "Developed by: Maria Alejandra Ocampo",
         })
         return context
-#Activity 1
+
+# Contact
 class ContactPageView(TemplateView):
     template_name = "pages/contact.html"
 
@@ -38,94 +38,74 @@ class ContactPageView(TemplateView):
             "address": "123Sur , Medellin , Colombia",
             "phone": "+57 (305) 234-4567",
         })
-        return context  
-    
+        return context
 
-class Product:
-    products = [
-        {"id": "1", "name": "TV", "description": "Best TV", "price": 599.99},
-        {"id": "2", "name": "iPhone", "description": "Best iPhone", "price": 999.99},
-        {"id": "3", "name": "Chromecast", "description": "Best Chromecast", "price": 49.99},
-        {"id": "4", "name": "Glasses", "description": "Best Glasses", "price": 19.99},
-    ]
-    
-
-class ProductIndexView(View):
+# Mostrar producto
+class ProductShowView(View):
     template_name = 'products/index.html'
 
-    def get(self, request):
-        viewData = {}
-        viewData["title"] = "Products - Online Store"
-        viewData["subtitle"] = "List of products"
-        viewData["products"] = Product.products
-        return render(request, self.template_name, viewData)
-
-class ProductShowView(View):
-    template_name = 'products/show.html'
-
     def get(self, request, id):
-        viewData = {}
-
         try:
-            # Convertir el id a entero (puede fallar si no es número)
-            product_index = int(id) - 1
-
-            # Verificar que el índice esté dentro de la lista de productos
-            if product_index < 0 or product_index >= len(Product.products):
-                # Si está fuera de rango, redirigir al home
-                return HttpResponseRedirect(reverse('home'))
-
-        except ValueError:
-            # Si el id no es número (ejemplo: abc), redirigir al home
+            product_id = int(id)
+            if product_id < 1:
+                raise ValueError("Product ID must be 1 or greater")
+        except (ValueError, TypeError):
             return HttpResponseRedirect(reverse('home'))
 
-        # Si es válido, obtener el producto
-        product = Product.products[product_index]
-        viewData["title"] = product["name"] + " - Online Store"
-        viewData["subtitle"] = product["name"] + " - Product information"
-        viewData["product"] = product
-        return render(request, self.template_name, viewData)
+        product = get_object_or_404(Product, pk=product_id)
 
-#Actividad 7
+        context = {
+            "title": f"{product.name} - Online Store",
+            "subtitle": f"{product.name} - Product information",
+            "product": product,
+        }
+        return render(request, self.template_name, context)
+
+# Listar productos
+class ProductIndexView(ListView):
+    model = Product
+    template_name = 'products/index.html'
+    context_object_name = 'products'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Products - Online Store'
+        context['subtitle'] = 'List of products'
+        return context
+
+# Formulario
 class ProductForm(forms.Form):
     name = forms.CharField(required=True)
     price = forms.FloatField(required=True)
 
-    # Validación personalizada para el campo price
     def clean_price(self):
         price = self.cleaned_data.get('price')
-
-        # Verifica que sea mayor que 0
         if price is not None and price <= 0:
             raise forms.ValidationError("The price must be greater than 0.")
-
         return price
-    
 
+# Crear producto
 class ProductCreateView(View):
     template_name = 'products/create.html'
 
     def get(self, request):
         form = ProductForm()
-        viewData = {
-            "title": "Create product",
-            "form": form
-        }
-        return render(request, self.template_name, viewData)
+        return render(request, self.template_name, {"title": "Create product", "form": form})
 
     def post(self, request):
         form = ProductForm(request.POST)
         if form.is_valid():
-            # Pasamos created=True para mostrar el mensaje en la plantilla
-            viewData = {
+            Product.objects.create(
+                name=form.cleaned_data["name"],
+                price=form.cleaned_data["price"]
+            )
+            return render(request, self.template_name, {
                 "title": "Create product",
-                "form": ProductForm(),  # formulario vacío luego de crear
+                "form": ProductForm(),
                 "created": True
-            }
-            return render(request, self.template_name, viewData)
-        else:
-            viewData = {
-                "title": "Create product",
-                "form": form
-            }
-            return render(request, self.template_name, viewData)
+            })
+        return render(request, self.template_name, {
+            "title": "Create product",
+            "form": form
+        })
+    
