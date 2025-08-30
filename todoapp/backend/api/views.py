@@ -8,12 +8,10 @@ class ToDoListCreate(generics.ListCreateAPIView):
     POST /api/todos/  -> crea un ToDo para el usuario autenticado
     """
     serializer_class = ToDoSerializer
-    permission_classes = [permissions.IsAuthenticated]  # exige login
+    permission_classes = [permissions.IsAuthenticated]  # <- clave
 
     def get_queryset(self):
-        user = self.request.user
-        return ToDo.objects.filter(user=user).order_by('-created')
+        return ToDo.objects.filter(user=self.request.user).order_by('-created')
 
     def perform_create(self, serializer):
-        # Asigna el usuario autenticado al nuevo ToDo
         serializer.save(user=self.request.user)
