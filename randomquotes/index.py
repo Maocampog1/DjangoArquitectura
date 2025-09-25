@@ -1,5 +1,6 @@
-from flask import Flask
-import os, random
+from flask import Flask, jsonify
+import os
+import random
 
 app = Flask(__name__)
 
@@ -13,11 +14,11 @@ phrases = [
     "Alone or not you gonna walk forward.",
 ]
 
-@app.route("/")
+@app.route('/')
 def get_random_quote():
     phrase = random.choice(phrases)
     container_id = os.uname()[1]
     return f"{phrase} - Container Id: {container_id}"
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=80)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=80)
